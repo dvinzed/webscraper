@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  engine:
+    build:
+      context: .
+      dockerfile: Dockerfile.engine
+    container_name: webscraper-engine-new
+    environment:
+      - MONGO_URI=mongodb+srv://aklymenko872:RMGQaaq8qKGTI0ca@cluster0.giianli.mongodb.net/web_scraper_db
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: webscraper-web-new
+    environment:
+      - MONGO_URI=mongodb+srv://aklymenko872:RMGQaaq8qKGTI0ca@cluster0.giianli.mongodb.net/web_scraper_db
+    ports:
+      - "5000:5000"

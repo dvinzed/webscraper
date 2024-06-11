@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webscraper-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webscraper-web
+  template:
+    metadata:
+      labels:
+        app: webscraper-web
+    spec:
+      containers:
+      - name: web
+        image: dvinzerd/web_scraper-web:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: MONGO_URI
+          value: mongodb+srv://aklymenko872:RMGQaaq8qKGTI0ca@cluster0.giianli.mongodb.net/web_scraper_db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webscraper-web
+spec:
+  type: NodePort
+  ports:
+  - port: 5000
+    nodePort: 30001
+  selector:
+    app: webscraper-web

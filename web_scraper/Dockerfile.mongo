@@ -1,0 +1,8 @@
+# Используем официальный образ MongoDB
+FROM mongo:latest
+
+# Устанавливаем рабочую директорию
+WORKDIR /data/db
+
+# Открываем порт для MongoDB
+EXPOSE 27017

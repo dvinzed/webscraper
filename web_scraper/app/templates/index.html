@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraper</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-book-reader"></i> Web Scraper
+        </a>
+    </nav>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h2>Web Scraper</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="scrapeForm" class="mt-4">
+                            <div class="form-group">
+                                <label for="urls">Enter URL:</label>
+                                <input type="text" class="form-control" id="urls" name="urls" placeholder="https://example.com">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="sort_by">Sort by:</label>
+                                    <select class="form-control" id="sort_by" name="sort_by">
+                                        <option value="book_name">Book Name</option>
+                                        <option value="author">Author</option>
+                                        <option value="price">Price</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="sort_order">Sort order:</label>
+                                    <select class="form-control" id="sort_order" name="sort_order">
+                                        <option value="asc">Ascending</option>
+                                        <option value="desc">Descending</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="filter_by">Filter by book name or author:</label>
+                                    <input type="text" class="form-control" id="filter_by" name="filter_by" placeholder="Enter book name or author">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-search"></i> Scrape
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="alerts" class="mt-4"></div>
+
+                <div class="mt-4">
+                    <h3 class="text-center">Results</h3>
+                    <div id="loadingSpinner" class="text-center" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center" id="results"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('scrapeForm').onsubmit = async function(event) {
+            event.preventDefault();
+            const urls = document.getElementById('urls').value.split(',').map(url => url.trim());
+            const sort_by = document.getElementById('sort_by').value;
+            const sort_order = document.getElementById('sort_order').value;
+            const filter_by = document.getElementById('filter_by').value;
+
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const resultsDiv = document.getElementById('results');
+            const alertsDiv = document.getElementById('alerts');
+
+            resultsDiv.innerHTML = '';
+            alertsDiv.innerHTML = '';
+            loadingSpinner.style.display = 'block';
+
+            const response = await fetch('/scrape', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ urls, sort_by, sort_order, filter_by })
+            });
+
+            loadingSpinner.style.display = 'none';
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                result.data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'col-md-4 mb-4 d-flex align-items-stretch fade-in';
+                    card.innerHTML = `
+                        <div class="card shadow-sm">
+                            <img src="${item.image_url}" class="card-img-top" alt="${item.book_name}">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">${item.book_name}</h5>
+                                <p class="card-author"><i class="fas fa-user"></i> ${item.author}</p>
+                                <p class="card-price"><i class="fas fa-tag"></i> ${item.price_text}</p>
+                                <a href="${item.book_url}" target="_blank" class="btn btn-primary mt-auto">View Book</a>
+                            </div>
+                        </div>
+                    `;
+                    resultsDiv.appendChild(card);
+                });
+            } else {
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-danger';
+                alert.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${result.message}`;
+                alertsDiv.appendChild(alert);
+            }
+        };
+    </script>
+</body>
+</html>

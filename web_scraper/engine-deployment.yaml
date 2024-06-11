@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webscraper-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webscraper-engine
+  template:
+    metadata:
+      labels:
+        app: webscraper-engine
+    spec:
+      containers:
+      - name: engine
+        image: dvinzerd/web_scraper-engine:latest
+        env:
+        - name: MONGO_URI
+          value: mongodb+srv://aklymenko872:RMGQaaq8qKGTI0ca@cluster0.giianli.mongodb.net/web_scraper_db

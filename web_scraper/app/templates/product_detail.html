@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Detail</title>
+</head>
+<body>
+    <h1>{{ product.product_name }}</h1>
+    <p>Price: {{ product.price }}</p>
+    <p>Availability: {{ product.availability }}</p>
+    <h3>Characteristics:</h3>
+    <ul>
+        {% for characteristic in product.characteristics %}
+            <li>{{ characteristic }}</li>
+        {% endfor %}
+    </ul>
+    <p><a href="{{ product.url }}" target="_blank">View on original site</a></p>
+</body>
+</html>
